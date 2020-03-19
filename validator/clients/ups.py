@@ -12,6 +12,7 @@ _session.headers = requests.structures.CaseInsensitiveDict(data={
     'Password': os.getenv('UPS_PASSWORD', ''),
 })
 
+
 class AmbiguousAddressError(Exception):
     """If the UPS API says an address is ambiguous."""
 
@@ -20,7 +21,9 @@ class APIFailure(Exception):
     """If the API gave us a non-success response."""
 
 
-def build_request_body(address_lines: List[str], region: str) -> Dict[str, Any]:
+def build_request_body(
+        address_lines: List[str],
+        region: str) -> Dict[str, Any]:
     """Build a request body for the UPS API.
 
     :param address_lines: List of address lines
@@ -38,13 +41,16 @@ def build_request_body(address_lines: List[str], region: str) -> Dict[str, Any]:
         }
 
 
-def address_valid(body: Dict[str, Any], session: requests.Session = None) -> bool:
+def address_valid(
+        body: Dict[str, Any],
+        session: requests.Session = None) -> bool:
     """Ask UPS if an address is valid.
 
     :param body: The properly formed UPS request body.
     :param session: A custom session (will default to the one in this module).
     :returns: Bool of if it's valid or not.
-    :raises AmbiguousAddressError: if it couldn't get the exact address validated.
+    :raises AmbiguousAddressError: if it couldn't get the exact address
+        validated.
     :raises APIFailure: If we got an error back from the API
     :raises HTTPError: If we couldn't connect to the API
     """
@@ -63,10 +69,10 @@ def address_valid(body: Dict[str, Any], session: requests.Session = None) -> boo
     if resp_status.get('Code') != 1:
         raise APIFailure(resp_status.get('Description', 'UNKNOWN'))
 
-    if xav_response.get('AmbiguousAddressIndicator') != None:
+    if xav_response.get('AmbiguousAddressIndicator') is not None:
         raise AmbiguousAddressError()
 
-    if xav_response.get('ValidAddressIndicator') != None:
+    if xav_response.get('ValidAddressIndicator') is not None:
         return True
-    
+
     return False

@@ -12,8 +12,14 @@ class TestUps(TestCase):
         region = 'City,State,123456'
         body = ups.build_request_body(address_lines, region)
 
-        self.assertEqual(body['XAVRequest']['AddressKeyFormat']['AddressLine'], address_lines)
-        self.assertEqual(body['XAVRequest']['AddressKeyFormat']['Region'], region)
+        self.assertEqual(
+            body['XAVRequest']['AddressKeyFormat']['AddressLine'],
+            address_lines
+        )
+        self.assertEqual(
+            body['XAVRequest']['AddressKeyFormat']['Region'],
+            region
+        )
 
     def test_address_valid__true(self):
         response = requests.Response()
