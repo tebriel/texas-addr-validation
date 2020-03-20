@@ -28,7 +28,7 @@ class TestUps(TestCase):
             'XAVResponse': {
                 'Response': {
                     'ResponseStatus': {
-                        'Code': 1,
+                        'Code': '1',
                         'Description': 'Success'
                     }
                 },
@@ -46,7 +46,7 @@ class TestUps(TestCase):
             'XAVResponse': {
                 'Response': {
                     'ResponseStatus': {
-                        'Code': 2,
+                        'Code': '2',
                         'Description': 'Failure'
                     }
                 },
@@ -80,7 +80,7 @@ class TestUps(TestCase):
             'XAVResponse': {
                 'Response': {
                     'ResponseStatus': {
-                        'Code': 1,
+                        'Code': '1',
                         'Description': 'Success'
                     }
                 },

@@ -57,7 +57,9 @@ def address_valid(
     if not session:
         session = _session
 
-    resp = session.post(body, timeout=5)
+    resp = session.post(PROD_URL, json=body, timeout=5)
+    print(session.headers)
+    print(resp.content)
 
     resp.raise_for_status()
 
@@ -66,7 +68,7 @@ def address_valid(
     xav_response = resp_data.get('XAVResponse', {})
     resp_status = xav_response.get('Response', {}).get('ResponseStatus', {})
 
-    if resp_status.get('Code') != 1:
+    if resp_status.get('Code') != '1':
         raise APIFailure(resp_status.get('Description', 'UNKNOWN'))
 
     if xav_response.get('AmbiguousAddressIndicator') is not None:
