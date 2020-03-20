@@ -8,11 +8,14 @@ EXPOSE 3000
 
 WORKDIR /workdir
 
+COPY requirements.txt /workdir
+
+RUN pip install -r requirements.txt
+
 COPY . /workdir
 
-RUN pip install -r requirements.txt \
-    && pip install -e .
+RUN pip install -e .
 
 USER web
 
-CMD [ "gunicorn", "-w", "4" "-b", "0.0.0.0:3000", "validator:validator"" ]
+CMD ./start.sh
