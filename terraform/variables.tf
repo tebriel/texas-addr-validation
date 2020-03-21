@@ -1,19 +1,19 @@
 variable ups_license_number {
-    type = string
+  type = string
 }
 
 variable ups_username {
-    type = string
+  type = string
 }
 
 variable ups_password {
-    type = string
+  type = string
 }
 
 variable handshake_key {
-    type = string
+  type = string
 }
 
 variable hmac_key {
-    type = string
+  type = string
 }
