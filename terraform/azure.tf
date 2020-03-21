@@ -19,29 +19,47 @@ resource "azurerm_resource_group" texas_addr_validation {
   location = "South Central US"
 }
 
-resource "azurerm_storage_account" "texas" {
-  name                     = "functionsapptestsa"
-  resource_group_name      = "azurerm_resource_group.texas_addr_validation.name"
-  location                 = "azurerm_resource_group.texas_addr_validation.location"
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
+resource "azurerm_dns_zone" "texas" {
+  name                = "texas.frodux.in"
+  resource_group_name = azurerm_resource_group.texas_addr_validation.name
 }
 
-resource "azurerm_app_service_plan" "texas" {
-  name                = "azure-functions-texas-service-plan"
-  location            = "azurerm_resource_group.texas_addr_validation.location"
-  resource_group_name = "azurerm_resource_group.texas_addr_validation.name"
+resource "azurerm_dns_cname_record" "validator" {
+  name                = "validator"
+  zone_name           = azurerm_dns_zone.texas.name
+  resource_group_name = azurerm_resource_group.texas_addr_validation.name
+  ttl                 = 60
+  record              = azurerm_container_group.flask.fqdn
+}
 
-  sku {
-    tier = "Standard"
-    size = "S1"
+resource "azurerm_container_group" "flask" {
+  name                = "flask-container"
+  location            = azurerm_resource_group.texas_addr_validation.location
+  resource_group_name = azurerm_resource_group.texas_addr_validation.name
+  ip_address_type     = "public"
+  dns_name_label      = "texas-addr-validation"
+  os_type             = "Linux"
+
+  container {
+    name   = "flask"
+    image  = "cmoultrie/texas-addr-validation:latest"
+    cpu    = "0.5"
+    memory = "1.5"
+
+    ports {
+      port     = 3000
+      protocol = "TCP"
+    }
+    secure_environment_variables = {
+      UPS_LICENSE_NUMBER: var.ups_license_number,
+      UPS_USERNAME: var.ups_username,
+      UPS_PASSWORD: var.ups_password,
+      HANDSHAKE_KEY: var.handshake_key,
+      HMAC_KEY: var.hmac_key,
+    }
   }
-}
 
-resource "azurerm_function_app" "validator" {
-  name                      = "validator"
-  location                  = azurerm_resource_group.texas_addr_validation.location
-  resource_group_name       = azurerm_resource_group.texas_addr_validation.name
-  app_service_plan_id       = azurerm_app_service_plan.texas.id
-  storage_connection_string = azurerm_storage_account.texas.primary_connection_string
+  tags = {
+    environment = "testing"
+  }
 }

@@ -1,9 +1,12 @@
 import os
+import logging
 import hmac
 from flask import abort, request, Response
 
 from validator.clients import ups
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 HANDSHAKE_KEY = os.getenv('HANDSHAKE_KEY', '')
 HMAC_KEY = os.getenv('HMAC_KEY', '').encode('utf-8')
@@ -31,7 +34,9 @@ def incoming():
     data = request.get_json()
 
     if data.get('HandshakeKey') != HANDSHAKE_KEY:
-        return abort(Response('Invalid Handshake Key', status=403))
+        err_txt = 'Invalid Handshake Key'
+        logger.info(err_txt)
+        return abort(Response(err_txt, status=403))
 
     address = data['Address']
     address_lines = [address['address']]
